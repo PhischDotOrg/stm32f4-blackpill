@@ -37,15 +37,15 @@
  ******************************************************************************/
 static const constexpr stm32::PllCfg pllCfg = {
     .m_pllSource        = stm32::PllCfg::PllSource_t::e_PllSourceHSE,
-    .m_hseSpeedInHz     = 8 * 1000 * 1000,
-    .m_pllM             = 8,
-    .m_pllN             = 336,
+    .m_hseSpeedInHz     = 25 * 1000 * 1000,
+    .m_pllM             = 25,
+    .m_pllN             = 168,
     .m_pllP             = stm32::PllCfg::PllP_t::e_PllP_Div2,
     .m_pllQ             = stm32::PllCfg::PllQ_t::e_PllQ_Div7,
     .m_sysclkSource     = stm32::PllCfg::SysclkSource_t::e_SysclkPLL,
     .m_ahbPrescaler     = stm32::PllCfg::AHBPrescaler_t::e_AHBPrescaler_None,
-    .m_apb1Prescaler    = stm32::PllCfg::APBPrescaler_t::e_APBPrescaler_Div4,
-    .m_apb2Prescaler    = stm32::PllCfg::APBPrescaler_t::e_APBPrescaler_Div2
+    .m_apb1Prescaler    = stm32::PllCfg::APBPrescaler_t::e_APBPrescaler_Div2,
+    .m_apb2Prescaler    = stm32::PllCfg::APBPrescaler_t::e_APBPrescaler_None
 };
 
 static stm32::Scb                       scb(SCB);
@@ -74,14 +74,14 @@ static gpio::GpioEngine                 gpio_engine_D(&gpio_D);
  * LEDs
  ******************************************************************************/
 static gpio::AlternateFnPin             g_mco1(gpio_engine_A, 8);
-static gpio::DigitalOutPin              g_led_green(gpio_engine_D, 12);
+static gpio::DigitalOutPin              g_led_green(gpio_engine_C, 13);
 
 /*******************************************************************************
  * UART
  ******************************************************************************/
-static gpio::AlternateFnPin             uart_tx(gpio_engine_C, 6);
-static gpio::AlternateFnPin             uart_rx(gpio_engine_C, 7);
-static stm32::Uart::Usart6<gpio::AlternateFnPin>    uart_access(rcc, uart_rx, uart_tx);
+static gpio::AlternateFnPin             uart_tx(gpio_engine_A, 3);
+static gpio::AlternateFnPin             uart_rx(gpio_engine_A, 2);
+static stm32::Uart::Usart2<gpio::AlternateFnPin>    uart_access(rcc, uart_rx, uart_tx);
 uart::UartDevice                        g_uart(&uart_access);
 
 /*******************************************************************************
@@ -162,11 +162,11 @@ static tasks::PeriodicCallback  task_500ms("t_500ms", 2, 500, &toggleLed, &led_s
  ******************************************************************************/
 const uint32_t SystemCoreClock = pllCfg.getSysclkSpeedInHz();
 
-static_assert(pllCfg.isValid() == true,                             "PLL Configuration is not valid!");
-static_assert(SystemCoreClock               == 168 * 1000 * 1000,   "Expected System Clock to be at 168 MHz!");
-static_assert(pllCfg.getAhbSpeedInHz()      == 168 * 1000 * 1000,   "Expected AHB to be running at 168 MHz!");
-static_assert(pllCfg.getApb1SpeedInHz()     ==  42 * 1000 * 1000,   "Expected APB1 to be running at 42 MHz!");
-static_assert(pllCfg.getApb2SpeedInHz()     ==  84 * 1000 * 1000,   "Expected APB2 to be running at 84 MHz!");
+static_assert(pllCfg.isValid() == true,                            "PLL Configuration is not valid!");
+static_assert(SystemCoreClock               == 84 * 1000 * 1000,   "Expected System Clock to be at 84 MHz!");
+static_assert(pllCfg.getAhbSpeedInHz()      == 84 * 1000 * 1000,   "Expected AHB to be running at 84 MHz!");
+static_assert(pllCfg.getApb1SpeedInHz()     == 42 * 1000 * 1000,   "Expected APB1 to be running at 42 MHz!");
+static_assert(pllCfg.getApb2SpeedInHz()     == 84 * 1000 * 1000,   "Expected APB2 to be running at 84 MHz!");
 
 /*******************************************************************************
  *
